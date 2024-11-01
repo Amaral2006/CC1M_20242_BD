@@ -1,5 +1,4 @@
 CREATE DATABASE flyhigh_airlines;
-USE flyhigh_airlines;
 CREATE TABLE Passageiros (
     id_passageiro SERIAL PRIMARY KEY,
     nome VARCHAR(100),
