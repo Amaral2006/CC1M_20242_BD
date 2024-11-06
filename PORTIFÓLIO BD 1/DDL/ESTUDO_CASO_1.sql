@@ -53,7 +53,7 @@ CREATE TABLE Recebimento_Material (
     FOREIGN KEY (numero_pedido) REFERENCES Pedido_Compra(numero_pedido)
 );
 
--- Tabela Distribuicao_Filial (chave primária e chave estrangeira)
+
 CREATE TABLE Distribuicao_Filial (
     codigo_distribuicao INT PRIMARY KEY,
     codigo_filial INT,
