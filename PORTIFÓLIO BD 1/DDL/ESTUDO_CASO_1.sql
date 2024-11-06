@@ -1,7 +1,5 @@
 CREATE DATABASE CadeiaSuprimentos;
 USE CadeiaSuprimentos;
-
--- Tabela Fornecedor (somente chave primária)
 CREATE TABLE Fornecedor (
     codigo_fornecedor INT PRIMARY KEY,
     nome_empresa VARCHAR(100) NOT NULL,
@@ -12,7 +10,6 @@ CREATE TABLE Fornecedor (
     historico_fornecimento TEXT
 );
 
--- Tabela Produto (somente chave primária)
 CREATE TABLE Produto (
     codigo_produto INT PRIMARY KEY,
     nome_produto VARCHAR(100) NOT NULL,
@@ -22,7 +19,6 @@ CREATE TABLE Produto (
     preco_unitario DECIMAL(10, 2)
 );
 
--- Tabela Filial (somente chave primária)
 CREATE TABLE Filial (
     codigo_filial INT PRIMARY KEY,
     nome VARCHAR(100),
@@ -30,7 +26,6 @@ CREATE TABLE Filial (
     capacidade_armazenamento INT
 );
 
--- Tabela Estoque (chave primária e chave estrangeira)
 CREATE TABLE Estoque (
     codigo_produto INT PRIMARY KEY,
     quantidade_atual INT,
@@ -39,7 +34,6 @@ CREATE TABLE Estoque (
     FOREIGN KEY (codigo_produto) REFERENCES Produto(codigo_produto)
 );
 
--- Tabela Pedido_Compra (chave primária e chave estrangeira)
 CREATE TABLE Pedido_Compra (
     numero_pedido INT PRIMARY KEY,
     codigo_fornecedor INT,
@@ -49,7 +43,6 @@ CREATE TABLE Pedido_Compra (
     FOREIGN KEY (codigo_fornecedor) REFERENCES Fornecedor(codigo_fornecedor)
 );
 
--- Tabela Recebimento_Material (chave primária e chave estrangeira)
 CREATE TABLE Recebimento_Material (
     id_recebimento INT PRIMARY KEY,
     numero_pedido INT,
@@ -71,22 +64,9 @@ CREATE TABLE Distribuicao_Filial (
     FOREIGN KEY (codigo_produto) REFERENCES Produto(codigo_produto)
 );
 
--- Exemplos de operações ALTER (ADD, DROP, MODIFY, CHANGE)
-
--- Exemplo de ALTER para adicionar uma coluna na tabela Fornecedor
 ALTER TABLE Fornecedor ADD email VARCHAR(100);
-
--- Exemplo de ALTER para remover uma coluna da tabela Estoque
 ALTER TABLE Estoque DROP COLUMN localizacao_armazem;
-
--- Exemplo de ALTER para modificar o tipo de dado da coluna 'telefone' na tabela Fornecedor
 ALTER TABLE Fornecedor MODIFY telefone VARCHAR(30);
-
--- Exemplo de ALTER para renomear a coluna 'nome' para 'nome_filial' na tabela Filial
 ALTER TABLE Filial CHANGE nome nome_filial VARCHAR(100);
-
--- Comando DROP para excluir uma tabela completa no esquema
 DROP TABLE IF EXISTS Distribuicao_Filial;
-
--- Exemplo de comando DROP para excluir o esquema (se aplicável)
 DROP SCHEMA IF EXISTS CadeiaSuprimentos;
