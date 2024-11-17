@@ -1,126 +1,147 @@
-- Criação da tabela Fornecedores
-CREATE TABLE Fornecedores (
-    codigo INT AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(255),
+CREATE DATABASE cadeia de suplementos;
+USE cadeiadesuplementos;
+-- Criar a tabela Fornecedor
+CREATE TABLE Fornecedor (
+    fornecedor_id INT PRIMARY KEY,
+    nome_empresa VARCHAR(255),
     endereco VARCHAR(255),
-    pais VARCHAR(100),
+    pais_origem VARCHAR(255),
     pessoa_contato VARCHAR(255),
-    telefone VARCHAR(50)
+    telefone VARCHAR(50),
+    historico_fornecimento TEXT
 );
-
--- Inserções na tabela Fornecedores
-INSERT INTO Fornecedores (nome, endereco, pais, pessoa_contato, telefone) 
-VALUES ('Fornecedor A', 'Rua 1, Bairro 1', 'Brasil', 'João Silva', '+55 11 1234-5678');
-
-INSERT INTO Fornecedores (nome, endereco, pais, pessoa_contato, telefone) 
-VALUES ('Fornecedor B', 'Av. 2, Centro', 'Estados Unidos', 'Mary Johnson', '+1 212 555-7890');
-
--- Criação da tabela Produtos
-CREATE TABLE Produtos (
-    codigo INT AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(255),
+-- Criar a tabela Produto
+CREATE TABLE Produto (
+    produto_id INT PRIMARY KEY,
+    nome_produto VARCHAR(255),
     descricao TEXT,
-    especificacoes_tecnicas TEXT,
     unidade_medida VARCHAR(50),
-    preco_unitario DECIMAL(10,2),
-    estoque_atual INT,
-    ponto_ressuprimento INT,
-    localizacao_armazem VARCHAR(100)
+    preco_unitario DECIMAL(10, 2)
 );
 
--- Inserções na tabela Produtos
-INSERT INTO Produtos (nome, descricao, especificacoes_tecnicas, unidade_medida, preco_unitario, estoque_atual, ponto_ressuprimento, localizacao_armazem) 
-VALUES ('Produto 1', 'Descrição do produto 1', 'Especificação 1', 'Unidade', 100.00, 50, 10, 'Armazém A');
+-- Criar a tabela PedidoCompra
+CREATE TABLE PedidoCompra (
+    pedido_id INT PRIMARY KEY,
+    data_pedido DATE,
+    data_estimativa_entrega DATE,
+    status_pedido VARCHAR(50),
+    fornecedor_id INT,
+    FOREIGN KEY (fornecedor_id) REFERENCES Fornecedor(fornecedor_id)
+);
 
-INSERT INTO Produtos (nome, descricao, especificacoes_tecnicas, unidade_medida, preco_unitario, estoque_atual, ponto_ressuprimento, localizacao_armazem) 
-VALUES ('Produto 2', 'Descrição do produto 2', 'Especificação 2', 'Quilos', 200.00, 100, 20, 'Armazém B');
+-- Criar a tabela RecebimentoMateriais
+CREATE TABLE RecebimentoMateriais (
+    recebimento_id INT PRIMARY KEY,
+    data_recebimento DATE,
+    quantidade_recebida INT,
+    condicao_material VARCHAR(50),
+    motivo_rejeicao TEXT,
+    pedido_id INT,
+    FOREIGN KEY (pedido_id) REFERENCES PedidoCompra(pedido_id)
+);
 
--- Criação da tabela Filiais
-CREATE TABLE Filiais (
-    codigo INT AUTO_INCREMENT PRIMARY KEY,
+-- Criar a tabela Filial
+CREATE TABLE Filial (
+    filial_id INT PRIMARY KEY,
     nome VARCHAR(255),
     endereco VARCHAR(255),
     capacidade_armazenamento INT
 );
 
--- Inserções na tabela Filiais
-INSERT INTO Filiais (nome, endereco, capacidade_armazenamento) 
-VALUES ('Filial 1', 'Rua A, Bairro X', 500);
-
-INSERT INTO Filiais (nome, endereco, capacidade_armazenamento) 
-VALUES ('Filial 2', 'Av. B, Centro', 300);
-
--- Criação da tabela Pedidos de Compra
-CREATE TABLE PedidosCompra (
-    numero INT AUTO_INCREMENT PRIMARY KEY,
-    fornecedor_id INT,
-    data_pedido DATE,
-    data_entrega DATE,
-    status VARCHAR(50),
-    FOREIGN KEY (fornecedor_id) REFERENCES Fornecedores(codigo)
-);
-
--- Inserções na tabela Pedidos de Compra
-INSERT INTO PedidosCompra (fornecedor_id, data_pedido, data_entrega, status) 
-VALUES (1, '2024-11-01', '2024-11-10', 'Em processamento');
-
-INSERT INTO PedidosCompra (fornecedor_id, data_pedido, data_entrega, status) 
-VALUES (2, '2024-11-05', '2024-11-15', 'Enviado');
-
--- Criação da tabela ItensPedidoCompra
-CREATE TABLE ItensPedidoCompra (
-    pedido_id INT,
+-- Criar a tabela Estoque
+CREATE TABLE Estoque (
+    estoque_id INT PRIMARY KEY,
+    quantidade_em_estoque INT,
+    localizacao_armazenagem VARCHAR(255),
+    ponto_ressuprimento INT,
     produto_id INT,
-    quantidade INT,
-    PRIMARY KEY (pedido_id, produto_id),
-    FOREIGN KEY (pedido_id) REFERENCES PedidosCompra(numero),
-    FOREIGN KEY (produto_id) REFERENCES Produtos(codigo)
-);
-
--- Inserções na tabela ItensPedidoCompra
-INSERT INTO ItensPedidoCompra (pedido_id, produto_id, quantidade) 
-VALUES (1, 1, 20);
-
-INSERT INTO ItensPedidoCompra (pedido_id, produto_id, quantidade) 
-VALUES (1, 2, 10);
-
--- Criação da tabela RecebimentoMateriais
-CREATE TABLE RecebimentoMateriais (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    pedido_id INT,
-    data_recebimento DATE,
-    condicao_material VARCHAR(50),
-    motivo_rejeicao TEXT,
-    FOREIGN KEY (pedido_id) REFERENCES PedidosCompra(numero)
-);
-
--- Inserções na tabela RecebimentoMateriais
-INSERT INTO RecebimentoMateriais (pedido_id, data_recebimento, condicao_material, motivo_rejeicao) 
-VALUES (1, '2024-11-12', 'Aceito', NULL);
-
-INSERT INTO RecebimentoMateriais (pedido_id, data_recebimento, condicao_material, motivo_rejeicao) 
-VALUES (2, '2024-11-16', 'Rejeitado', 'Material fora das especificações');
-
--- Criação da tabela TransferenciasFiliais
-CREATE TABLE TransferenciasFiliais (
-    id INT AUTO_INCREMENT PRIMARY KEY,
     filial_id INT,
-    produto_id INT,
-    quantidade INT,
-    data_transferencia DATE,
-    FOREIGN KEY (filial_id) REFERENCES Filiais(codigo),
-    FOREIGN KEY (produto_id) REFERENCES Produtos(codigo)
+    FOREIGN KEY (produto_id) REFERENCES Produto(produto_id),
+    FOREIGN KEY (filial_id) REFERENCES Filial(filial_id)
 );
 
--- Inserções na tabela TransferenciasFiliais
-INSERT INTO TransferenciasFiliais (filial_id, produto_id, quantidade, data_transferencia) 
-VALUES (1, 1, 15, '2024-11-15');
+-- Criar a tabela TransferenciaProdutos
+CREATE TABLE TransferenciaProdutos (
+    transferencia_id INT PRIMARY KEY,
+    data_transferencia DATE,
+    quantidade_transferida INT,
+    filial_origem_id INT,
+    filial_destino_id INT,
+    produto_id INT,
+    FOREIGN KEY (filial_origem_id) REFERENCES Filial(filial_id),
+    FOREIGN KEY (filial_destino_id) REFERENCES Filial(filial_id),
+    FOREIGN KEY (produto_id) REFERENCES Produto(produto_id)
+);
 
-INSERT INTO TransferenciasFiliais (filial_id, produto_id, quantidade, data_transferencia) 
-VALUES (2, 2, 10, '2024-11-16');
+-- Inserir dados na tabela Fornecedor
+INSERT INTO Fornecedor (fornecedor_id, nome_empresa, endereco, pais_origem, pessoa_contato, telefone, historico_fornecimento)
+VALUES 
+(1, 'Fornecedor A', 'Rua ABC, 123', 'Brasil', 'João Silva', '1111-1111', 'Entrega contínua de matéria-prima'),
+(2, 'Fornecedor B', 'Av. XYZ, 456', 'EUA', 'Maria Oliveira', '2222-2222', 'Fornecedor de peças eletrônicas'),
+(3, 'Fornecedor C', 'Rua DEF, 789', 'China', 'Li Wei', '3333-3333', 'Fornecimento esporádico de componentes');
 
--- Atualizações e Exclusões
-UPDATE PedidosCompra SET status = 'Recebido' WHERE numero = 1;
-UPDATE Produtos SET estoque_atual = estoque_atual - 15 WHERE codigo = 1;
+-- Inserir dados na tabela Produto
+INSERT INTO Produto (produto_id, nome_produto, descricao, unidade_medida, preco_unitario)
+VALUES
+(1, 'Produto A', 'Produto básico para fabricação', 'kg', 50.00),
+(2, 'Produto B', 'Peça eletrônica de alta qualidade', 'unidade', 100.00),
+(3, 'Produto C', 'Componente mecânico', 'kg', 30.00);
 
-DELETE FROM TransferenciasFiliais WHERE id = 2;
+-- Inserir dados na tabela PedidoCompra
+INSERT INTO PedidoCompra (pedido_id, data_pedido, data_estimativa_entrega, status_pedido, fornecedor_id)
+VALUES
+(1, '2024-10-10', '2024-10-20', 'Em Processamento', 1),
+(2, '2024-11-05', '2024-11-15', 'Em Processamento', 2),
+(3, '2024-11-10', '2024-11-20', 'Em Processamento', 3);
+
+-- Inserir dados na tabela RecebimentoMateriais
+INSERT INTO RecebimentoMateriais (recebimento_id, data_recebimento, quantidade_recebida, condicao_material, motivo_rejeicao, pedido_id)
+VALUES
+(1, '2024-10-21', 100, 'Aceito', NULL, 1),
+(2, '2024-11-16', 50, 'Rejeitado', 'Danos no transporte', 2),
+(3, '2024-11-18', 150, 'Aceito', NULL, 3);
+
+-- Inserir dados na tabela Filial
+INSERT INTO Filial (filial_id, nome, endereco, capacidade_armazenamento)
+VALUES
+(1, 'Filial A', 'Av. Principal, 100', 1000),
+(2, 'Filial B', 'Rua Secundária, 200', 500),
+(3, 'Filial C', 'Estrada do Norte, 300', 750);
+
+-- Inserir dados na tabela Estoque
+INSERT INTO Estoque (estoque_id, quantidade_em_estoque, localizacao_armazenagem, ponto_ressuprimento, produto_id, filial_id)
+VALUES
+(1, 200, 'A1', 50, 1, 1),
+(2, 100, 'B2', 30, 2, 2),
+(3, 300, 'C3', 100, 3, 3);
+
+-- Inserir dados na tabela TransferenciaProdutos
+INSERT INTO TransferenciaProdutos (transferencia_id, data_transferencia, quantidade_transferida, filial_origem_id, filial_destino_id, produto_id)
+VALUES
+(1, '2024-11-05', 50, 1, 2, 1),
+(2, '2024-11-10', 75, 2, 3, 2),
+(3, '2024-11-15', 100, 3, 1, 3);
+
+-- Atualizar o status do PedidoCompra
+UPDATE PedidoCompra
+SET status_pedido = 'Enviado'
+WHERE pedido_id = 1;
+
+-- Atualizar a quantidade em estoque
+UPDATE Estoque
+SET quantidade_em_estoque = 180
+WHERE estoque_id = 1;
+
+-- Deletar um fornecedor
+DELETE FROM Fornecedor
+WHERE fornecedor_id = 2;
+
+-- Deletar um produto
+DELETE FROM Produto
+WHERE produto_id = 3;
+
+
+
+
+
+
